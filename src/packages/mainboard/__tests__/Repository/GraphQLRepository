@@ -1,0 +1,82 @@
+import { cloneDeep, has } from 'lodash'
+import { of } from 'rxjs/observable/of'
+import { AbstractcBaseEntity } from '../../BaseEntity'
+import { field, entity } from '../../Decorator/EntityDecorator'
+import { RepositoryFactory } from '../../Repository/RepositoryFactory'
+import { withMessageBus } from '../../MapToStream/withMessageBus'
+import { compose } from '../../MapToStream/compose'
+import { withDefaults } from '../../MapToStream/withDefaults'
+import { withState } from '../../MapToStream/withState'
+import { withObservable } from '../../MapToStream/withObservable'
+import {} from 'jest'
+
+@entity('Device')
+class Device extends AbstractcBaseEntity {
+  @field() private model: string
+  @field() private appVersion: string
+  @field() private systemName: string
+  @field() private systemVersion: string
+}
+@entity('Patient')
+class Patient extends AbstractcBaseEntity {
+  @field() private _id: string
+  @field() private mobile: string
+  @field() private avatar: string
+  @field() private isBound: boolean
+  @field(Device) private device: Device
+  //@field(CaseRecord) private caseRecord: Array<CaseRecord>
+}
+describe('graphqlrepository test', () => {
+  test('find by conditions', () => {
+    let expect_result = {
+      patient: {
+        _id: 'patient2',
+        mobile: '5678i',
+        avatar:
+          'http://wx.qlogo.cn/mmopen/ajNVdqHZLLBAdlef4Dzu6CuyTEFePcKQNuhhNeXGnhuic16hZYib9d4xyJhqCJE1dpBgC7fBMIOG30WtytZqV5LQ/0',
+        isBound: true,
+        device: {
+          model: null,
+          appVersion: null,
+          systemName: '3456789',
+          systemVersion: null,
+          __typename: 'Device',
+        },
+        __typename: 'Patient',
+      },
+    }
+    const rf = new RepositoryFactory()
+    const graphqlRepo = rf.createGraphQLRespository<Patient>(Patient)
+    graphqlRepo.find(
+      { patientId: 'patient2' },
+      { from: 'patient', queryName: 'getUserByIds' }
+    )
+    compose(
+      withMessageBus('Patient', 'getUserByIds', data => {
+        if (data) {
+          if (data.patient.mobile == '234234') {
+            data.patient.mobile = '5678i'
+          }
+        }
+        return data
+      }),
+      withDefaults({ foo: 'jkjkjkj' }),
+      withState('foo', 'setFoo', 'iop')
+    )().subscribe(value => {
+      if (has(value, 'getUserByIds') && value.getUserByIds) {
+        console.log('getUserByIds----', value)
+        expect(value.getUserByIds).toEqual(expect_result)
+      }
+    })
+  })
+
+  test('find by ', () => {
+    const rf1 = new RepositoryFactory()
+    const graphqlRepo1 = rf1.createGraphQLRespository<Patient>(Patient)
+    graphqlRepo1.find(
+      { patientId: 'patient2' },
+      { from: 'patient', queryName: 'getUserByIds' }
+    )
+    expect(3).toEqual(1 + 2)
+  })
+})

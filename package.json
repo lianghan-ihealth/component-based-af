@@ -1,0 +1,75 @@
+{
+  "name": "component-based-af",
+  "version": "1.0.0",
+  "description": "component based",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack --config  webpack.config.js"
+  },
+  "keywords": [
+    "messagebus"
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/"
+    ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "author": "jk,lh",
+  "license": "MIT",
+  "dependencies": {
+    "@types/change-emitter": "^0.1.2",
+    "@types/graphql": "^0.13.1",
+    "@types/lodash": "^4.14.108",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "apollo-cache-inmemory": "^1.2.1",
+    "apollo-client": "^2.3.1",
+    "apollo-link": "^1.2.2",
+    "apollo-link-http": "^1.5.4",
+    "change-emitter": "^0.1.6",
+    "es6-promise": "^4.2.4",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
+    "graphql-tools": "^3.0.1",
+    "immutable": "^3.8.2",
+    "inversify": "^4.13.0",
+    "isomorphic-unfetch": "^2.0.0",
+    "lodash": "^4.17.10",
+    "prop-types": "^15.6.1",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "reflect-metadata": "^0.1.12",
+    "rxjs": "^5.5.8",
+    "ts-node": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.1.10",
+    "@types/enzyme-adapter-react-16": "^1.0.2",
+    "@types/jest": "^22.2.3",
+    "@types/react-test-renderer": "^16.0.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest": "^22.4.3",
+    "react-test-renderer": "^16.3.2",
+    "source-map-loader": "^0.2.3",
+    "ts-jest": "^22.4.6",
+    "ts-loader": "3.5.0",
+    "typescript": "^2.8.3",
+    "webpack": "^3.12.0"
+  }
+}

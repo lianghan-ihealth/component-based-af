@@ -1,0 +1,100 @@
+import * as React from 'react'
+import { AbstractcBaseEntity } from '../../mainboard/BaseEntity'
+import { get } from 'lodash'
+import { field, entity } from '../../mainboard/Decorator/EntityDecorator'
+import { RepositoryFactory } from '../../mainboard/Repository/RepositoryFactory'
+import { withDefaults } from '../../mainboard/MapToStream/withDefaults'
+import { withState } from '../../mainboard/MapToStream/withState'
+import { withMessageBus } from '../../mainboard/MapToStream/withMessageBus'
+import { recompose } from '../recompose'
+import { configure, mount, shallow } from 'enzyme'
+import { create } from 'react-test-renderer'
+import Adapter from 'enzyme-adapter-react-16'
+import {} from 'jest'
+import 'jest-enzyme'
+
+@entity('Device')
+class Device extends AbstractcBaseEntity {
+  @field() private model: string
+  @field() private appVersion: string
+  @field() private systemName: string
+  @field() private systemVersion: string
+}
+@entity('Patient')
+class Patient extends AbstractcBaseEntity {
+  @field() private _id: string
+  @field() private mobile: string
+  @field() private avatar: string
+  @field() private isBound: boolean
+  @field(Device) private device: Device
+  //@field(CaseRecord) private caseRecord: Array<CaseRecord>
+}
+configure({ adapter: new Adapter() })
+describe('test recompose', () => {
+  type setCounterFuncType = (counter: number) => void
+  interface BaseComponentProps {
+    counter: number
+    getUserByIds: {}
+    setCounter: setCounterFuncType
+  }
+  class BaseComponent extends React.Component<BaseComponentProps, any> {
+    constructor(props) {
+      super(props)
+    }
+    render() {
+      console.log(this.props, '+++++')
+      return (
+        <div>
+          <p>
+            Counter: <span id="counter">{this.props.counter}</span>
+          </p>
+
+          <a
+            id="increment"
+            onClick={() => this.props.setCounter(this.props.counter + 1)}
+          >
+            Increment
+          </a>
+          <p>
+            avatar:{' '}
+            <span id="avatar">
+              {get(this.props.getUserByIds, 'patient.avatar')}
+            </span>
+          </p>
+        </div>
+      )
+    }
+  }
+  const rf = new RepositoryFactory()
+  const graphqlRepo = rf.createGraphQLRespository<Patient>(Patient)
+  const p = graphqlRepo.find(
+    { patientId: 'patient2' },
+    { from: 'patient', queryName: 'getUserByIds' }
+  )
+  const Component = recompose(
+    withMessageBus('Patient', 'getUserByIds'),
+    withDefaults({ counter: 34 }),
+    withState('counter', 'setCounter', 56)
+  )(BaseComponent)
+  test.only('render with initial props', () => {
+    const wrapper = shallow(<Component />)
+    p.then(value => {
+      wrapper.update()
+      const html = wrapper.html()
+      expect(html).toEqual(
+        `<div><div><p>Counter: <span id="counter">56</span></p><a id="increment">Increment</a><p>avatar: <span id="avatar">http://wx.qlogo.cn/mmopen/ajNVdqHZLLBAdlef4Dzu6CuyTEFePcKQNuhhNeXGnhuic16hZYib9d4xyJhqCJE1dpBgC7fBMIOG30WtytZqV5LQ/0</span></p></div></div>`
+      )
+    })
+  })
+  test('test click envent', async () => {
+    const wrapper = mount(<Component />)
+    wrapper
+      .find('#increment')
+      .last()
+      .simulate('click')
+    const html = wrapper.html()
+    expect(html).toEqual(
+      `<div><div><p>Counter: <span id=\"counter\">57</span></p><a id=\"increment\">Increment</a><p>avatar: <span id=\"avatar\"></span></p></div></div>`
+    )
+  })
+})

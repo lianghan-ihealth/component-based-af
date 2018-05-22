@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es6",
+    "allowJs": true,
+    "lib": ["es6", "dom"],
+    "jsx": "react",
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "strict": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "types": ["reflect-metadata", "node"],
+    "allowSyntheticDefaultImports": false,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
