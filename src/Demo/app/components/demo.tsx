@@ -1,10 +1,12 @@
 import { get } from 'lodash'
 import * as React from 'react'
 import { DemoServices } from '../../services/DemoServices'
-import { withDefaults } from '../../../packages/mainboard/MapToStream/withDefaults'
-import { withState } from '../../../packages/mainboard/MapToStream/withState'
-import { withMessageBus } from '../../../packages/mainboard/MapToStream/withMessageBus'
-import { recompose } from '../../../packages/react-mainboard/recompose'
+import {
+  withDefaults,
+  withState,
+  withMessageBus,
+} from '../../../packages/mainboard'
+import { recompose } from '../../../packages/react-mainboard'
 
 type setCounterFuncType = (counter: number) => void
 interface DemoComponentProps {

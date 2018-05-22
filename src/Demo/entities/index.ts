@@ -1,8 +1,4 @@
-import { AbstractcBaseEntity } from '../../packages/mainboard/BaseEntity'
-import {
-  field,
-  entity,
-} from '../../packages/mainboard/Decorator/EntityDecorator'
+import { AbstractcBaseEntity, field, entity } from '../../packages/mainboard'
 
 @entity('Device')
 export class Device extends AbstractcBaseEntity {

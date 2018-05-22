@@ -1,2 +1,3 @@
-import recompose from './observe'
-export default { recompose }
+import recompose from './recompose'
+import observe from './observe'
+export { recompose }

@@ -6,7 +6,7 @@ import { compose } from './MapToStream/compose'
 import { withDefaults } from './MapToStream/withDefaults'
 import { withState } from './MapToStream/withState'
 
-export default {
+export {
   field,
   entity,
   RepositoryFactory,

@@ -1,5 +1,5 @@
-import { RepositoryFactory } from '../../packages/mainboard/Repository/RepositoryFactory'
 import { Patient, Device } from '../entities/index'
+import { RepositoryFactory } from '../../packages/mainboard'
 
 export class DemoServices {
   public getPatient() {
