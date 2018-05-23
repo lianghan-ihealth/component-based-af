@@ -23,9 +23,9 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
   //private _graphql: string
   private _entity_ctor: IEntityConstructor<T>
   private _regxQuery = new RegExp(
-    '(?<=^\\s*(query|mutation)\\s+)[a-zA-Z][\\w\\d]*'
+    '\\s*(query|mutation)\\s+([a-zA-Z][\\w\\d]*)\\s*{\\s*([a-zA-Z][\\w\\d]*)'
   )
-  private _regxFrom = new RegExp('(?<=\\s*({)\\s+)[a-zA-Z][\\w\\d]*')
+  //private _regxFrom = new RegExp('(\\s*(query|mutation)\\s+)([a-zA-Z][\\w\\d]*)\\s*{\\s*([a-zA-Z][\\w\\d]*)')
   constructor(
     dataproxy: IDataProxy,
     messageproxy: IClientMessageProxy,
@@ -200,8 +200,11 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
     return this.execInsert(`mutation ${queryName} ${query.getQuery()}`)
   }
   public execQuery(gqlQuery: string) {
-    const queryAliasName = gqlQuery.match(this._regxQuery)[0]
-    const from = gqlQuery.match(this._regxFrom)[0]
+    const queryAliasName = gqlQuery.match(this._regxQuery)[2]
+    const from = gqlQuery.match(this._regxQuery)[3]
+    // console.log('query:', gqlQuery)
+    // console.log('queryAliasName:', queryAliasName)
+    // console.log('from:', from)
     return this._dataproxy.query({
       query: gql`
         ${gqlQuery}
@@ -224,8 +227,8 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
   public execUpdate(gqlQuery: string) {
     // gqlQuery =
     //   'mutation sendTextChatMessage { sendTextChatMessage (chatRoomId:"chatRoom1",text:"23456789"){ text _id}}'
-    const queryAliasName = gqlQuery.match(this._regxQuery)[0]
-    const from = gqlQuery.match(this._regxFrom)[0]
+    const queryAliasName = gqlQuery.match(this._regxQuery)[2]
+    const from = gqlQuery.match(this._regxQuery)[3]
     return this._dataproxy.update({
       mutation: gql`
         ${gqlQuery}
@@ -239,8 +242,8 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
     })
   }
   public execInsert(gqlQuery: string) {
-    const queryAliasName = gqlQuery.match(this._regxQuery)[0]
-    const from = gqlQuery.match(this._regxFrom)[0]
+    const queryAliasName = gqlQuery.match(this._regxQuery)[2]
+    const from = gqlQuery.match(this._regxQuery)[3]
     return this._dataproxy.insert({
       mutation: gql`
         ${gqlQuery}
@@ -254,8 +257,8 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
     })
   }
   public execDelete(gqlQuery: string) {
-    const queryAliasName = gqlQuery.match(this._regxQuery)[0]
-    const from = gqlQuery.match(this._regxFrom)[0]
+    const queryAliasName = gqlQuery.match(this._regxQuery)[2]
+    const from = gqlQuery.match(this._regxQuery)[3]
     return this._dataproxy.delete({
       mutation: gql`
         ${gqlQuery}

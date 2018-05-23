@@ -15,8 +15,9 @@ interface DemoComponentProps {
   setCounter: setCounterFuncType
 }
 class DemoComponent extends React.Component<DemoComponentProps, any> {
-  constructor(props) {
+  constructor(props, context) {
     super(props)
+    console.log(context.app)
     const service = new DemoServices()
     service.getPatient()
   }

@@ -6,12 +6,12 @@ import { RepositoryFactory } from '../../mainboard/Repository/RepositoryFactory'
 import { withDefaults } from '../../mainboard/MapToStream/withDefaults'
 import { withState } from '../../mainboard/MapToStream/withState'
 import { withMessageBus } from '../../mainboard/MapToStream/withMessageBus'
-import { recompose } from '../recompose'
+import recompose from '../recompose'
 import { configure, mount, shallow } from 'enzyme'
 import { create } from 'react-test-renderer'
-import Adapter from 'enzyme-adapter-react-16'
+// import Adapter from 'enzyme-adapter-react-16'
 import {} from 'jest'
-import 'jest-enzyme'
+//import 'jest-enzyme'
 
 @entity('Device')
 class Device extends AbstractcBaseEntity {
@@ -29,7 +29,7 @@ class Patient extends AbstractcBaseEntity {
   @field(Device) private device: Device
   //@field(CaseRecord) private caseRecord: Array<CaseRecord>
 }
-configure({ adapter: new Adapter() })
+//configure({ adapter: new Adapter() })
 describe('test recompose', () => {
   type setCounterFuncType = (counter: number) => void
   interface BaseComponentProps {
