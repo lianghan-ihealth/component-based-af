@@ -17,7 +17,7 @@ interface DemoComponentProps {
 class DemoComponent extends React.Component<DemoComponentProps, any> {
   constructor(props, context) {
     super(props)
-    console.log(context.app)
+    //console.log(context.app)
     const service = new DemoServices()
     service.getPatient()
   }
