@@ -121,4 +121,10 @@ export class MemoryRepository<
   public execDelete(gql: string): Promise<any> {
     throw Error('execDelete is not implemented')
   }
+  public execsubscribe(gql: string): Promise<any> {
+    throw Error('execsubscribe is not implemented')
+  }
+  public subscribe(conditions: Partial<T>, findOptions?: FindOptions) {
+    throw Error('subscribe is not implemented')
+  }
 }

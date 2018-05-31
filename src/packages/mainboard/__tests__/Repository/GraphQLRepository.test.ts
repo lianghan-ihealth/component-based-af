@@ -51,6 +51,7 @@ describe('graphqlrepository test', () => {
       { patientId: 'patient2' },
       { from: 'patient', queryName: 'getUserByIds' }
     )
+    //graphqlRepo.subscribe()
     compose(
       withMessageBus('Patient', 'getUserByIds', data => {
         if (data) {

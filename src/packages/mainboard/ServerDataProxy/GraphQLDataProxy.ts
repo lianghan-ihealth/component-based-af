@@ -1,14 +1,16 @@
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient, ObservableQuery } from 'apollo-client'
 import { HttpLink, createHttpLink } from 'apollo-link-http'
-import { WatchQueryOptions, MutationOptions } from 'apollo-client'
-import { ApolloLink, execute, makePromise } from 'apollo-link'
+import {
+  WatchQueryOptions,
+  MutationOptions,
+  SubscriptionOptions,
+} from 'apollo-client'
+import { ApolloLink, execute, makePromise, Observable } from 'apollo-link'
 import gql from 'graphql-tag'
 import { injectable, inject } from 'inversify'
 import 'reflect-metadata'
-///import fetch from 'whatwg-fetch'
 import 'isomorphic-unfetch'
-//import fetch from 'isomorphic-unfetch'
 import { IDataProxy } from './IDataProxy'
 import GraphQLMutationsAftewareLink from '../ServerDataProxy/GraphQLMutationsAftewareLink'
 
@@ -82,6 +84,29 @@ export class GraphQLDataProxy implements IDataProxy {
   }
   public insert(options: MutationOptions): Promise<any> {
     return this._mutationOperate(options)
+  }
+  public subscribe(
+    options: SubscriptionOptions,
+    oldQuery: string,
+    callbackFun: any
+  ) {
+    return this._client.subscribe(options).subscribe(value => {
+      if (value.data) {
+        options.query
+        const data = this._client.readQuery({
+          query: gql`
+            ${oldQuery}
+          `,
+        })
+        this._client.writeQuery({
+          query: gql`
+            ${oldQuery}
+          `,
+          data: { ...data, value },
+        })
+        callbackFun(value)
+      }
+    })
   }
   private _mutationOperate(options: MutationOptions) {
     options.update = (proxy, fetchResult) => {

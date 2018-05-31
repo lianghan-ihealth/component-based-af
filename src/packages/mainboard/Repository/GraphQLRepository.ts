@@ -84,6 +84,25 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
     //console.log(`query ${queryName} ${query.getQuery()}`)
     return this.execQuery(`query ${queryName} ${query.getQuery()}`)
   }
+  subscribe(conditions: Partial<T>, findOptions?: FindOptions) {
+    let grqlbuilder = new GraphQLQueryBuilder(this._entity_ctor)
+    let query = grqlbuilder.selectQuery(this._entity_ctor).where(conditions)
+    let queryName = this._entity_ctor.name
+    let from = this._entity_ctor.name
+    if (findOptions) {
+      if (findOptions.select) {
+        query = query.select(findOptions.select)
+      }
+      if (findOptions.from) {
+        query = query.from(findOptions.from)
+        from = findOptions.from
+      }
+      if (findOptions.queryName) {
+        queryName = findOptions.queryName
+      }
+    }
+    this.execsubscribe(`subscription ${queryName} ${query.getQuery()}`)
+  }
   updateById(
     id: string,
     partialEntity: Partial<T>,
@@ -270,6 +289,24 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
         queryTypeName: from,
       },
     })
+  }
+  public execsubscribe(gqlQuery: string) {
+    const queryAliasName = gqlQuery.match(this._regxQuery)[2]
+    const from = gqlQuery.match(this._regxQuery)[3]
+    this._dataproxy.subscribe(
+      {
+        query: gql`
+          ${gqlQuery}
+        `,
+      },
+      gqlQuery.replace(new RegExp('^subscription'), 'query'),
+      data => {
+        let message = new Message()
+        message.Data = data
+        message.MessageType = DataType.Entity
+        this._messagproxy.pub(this._channel, queryAliasName, message)
+      }
+    )
   }
   clear(): void {
     throw Error('clear is not implemented')
