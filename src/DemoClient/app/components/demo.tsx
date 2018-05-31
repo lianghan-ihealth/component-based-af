@@ -12,6 +12,7 @@ type setCounterFuncType = (counter: number) => void
 interface DemoComponentProps {
   counter: number
   getUserByIds: {}
+  chatMessageAdded: {}
   setCounter: setCounterFuncType
 }
 class DemoComponent extends React.Component<DemoComponentProps, any> {
@@ -20,6 +21,7 @@ class DemoComponent extends React.Component<DemoComponentProps, any> {
     //console.log(context.app)
     const service = new DemoServices()
     service.getPatient()
+    service.getAddMessage()
   }
   render() {
     //console.log(this.props)
@@ -42,12 +44,19 @@ class DemoComponent extends React.Component<DemoComponentProps, any> {
             {get(this.props.getUserByIds, 'patient.avatar')}
           </span>
         </p>
+        <p>
+          avatar:{' '}
+          <span id="message">
+            {get(this.props.chatMessageAdded, 'chatMessageAdded')}
+          </span>
+        </p>
       </div>
     )
   }
 }
 const HocComponent = recompose(
   withMessageBus('Patient', 'getUserByIds'),
+  withMessageBus('Patient', 'chatMessageAdded'),
   withDefaults({ counter: 34 }),
   withState('counter', 'setCounter', 56)
 )(DemoComponent)

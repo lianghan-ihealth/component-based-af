@@ -71,13 +71,23 @@ describe('graphqlrepository test', () => {
     })
   })
 
-  test('find by ', () => {
+  test.only('sub ', () => {
     const rf1 = new RepositoryFactory()
     const graphqlRepo1 = rf1.createGraphQLRespository<Patient>(Patient)
-    graphqlRepo1.find(
-      { patientId: 'patient2' },
-      { from: 'patient', queryName: 'getUserByIds' }
-    )
+    graphqlRepo1.execsubscribe(`subscription chatMessageAdded {
+      chatMessageAdded(chatRoomId:"chatRoom1") {
+        _id
+        sender {
+          _id
+          avatar
+        }
+        ... on NeedleTextMessage {
+          text
+        }
+        createdAt
+      }
+    }
+`)
     expect(3).toEqual(1 + 2)
   })
 })

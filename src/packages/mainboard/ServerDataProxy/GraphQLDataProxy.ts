@@ -1,12 +1,20 @@
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient, ObservableQuery } from 'apollo-client'
 import { HttpLink, createHttpLink } from 'apollo-link-http'
+import { WebSocketLink } from 'apollo-link-ws'
+import { getMainDefinition } from 'apollo-utilities'
 import {
   WatchQueryOptions,
   MutationOptions,
   SubscriptionOptions,
 } from 'apollo-client'
-import { ApolloLink, execute, makePromise, Observable } from 'apollo-link'
+import {
+  ApolloLink,
+  execute,
+  makePromise,
+  Observable,
+  split,
+} from 'apollo-link'
 import gql from 'graphql-tag'
 import { injectable, inject } from 'inversify'
 import 'reflect-metadata'
@@ -14,10 +22,14 @@ import 'isomorphic-unfetch'
 import { IDataProxy } from './IDataProxy'
 import GraphQLMutationsAftewareLink from '../ServerDataProxy/GraphQLMutationsAftewareLink'
 
+interface Definintion {
+  kind: string
+  operation?: string
+}
 @injectable()
 export class GraphQLDataProxy implements IDataProxy {
   private _client: ApolloClient<any>
-  constructor(@inject('Url') url: string) {
+  constructor(@inject('Url') url: string, @inject('WsUrl') wsUrl: string) {
     const middlewareLink = new ApolloLink((operation, forward) => {
       operation.setContext({
         headers: {
@@ -29,14 +41,29 @@ export class GraphQLDataProxy implements IDataProxy {
       })
       return forward ? forward(operation) : null
     })
+    const wsLink = new WebSocketLink({
+      uri: wsUrl,
+      options: {
+        reconnect: true,
+      },
+    })
     const httpLink = createHttpLink({
       uri: url,
       fetch: fetch,
     })
+    const afterwareLink = new GraphQLMutationsAftewareLink().concat(httpLink)
+    const link = split(
+      // split based on operation type
+      ({ query }) => {
+        const { kind, operation }: Definintion = getMainDefinition(query)
+        return kind === 'OperationDefinition' && operation === 'subscription'
+      },
+      wsLink,
+      afterwareLink
+    )
     //const link = new HttpLink({ uri: url })
-    const afterwareLink = new GraphQLMutationsAftewareLink()
     this._client = new ApolloClient({
-      link: middlewareLink.concat(afterwareLink).concat(httpLink),
+      link: middlewareLink.concat(link),
       cache: new InMemoryCache(),
       defaultOptions: {
         watchQuery: {
@@ -71,6 +98,7 @@ export class GraphQLDataProxy implements IDataProxy {
     //console.log('ActiveQueryMap: ', global.ActiveQueryMap)
     this._client.watchQuery<any>(options).subscribe(value => {
       if (value.data) {
+        //console.log('777777777', value.data)
         options.context.callbackFun(options.context, value.data)
       }
     })
@@ -85,25 +113,10 @@ export class GraphQLDataProxy implements IDataProxy {
   public insert(options: MutationOptions): Promise<any> {
     return this._mutationOperate(options)
   }
-  public subscribe(
-    options: SubscriptionOptions,
-    oldQuery: string,
-    callbackFun: any
-  ) {
+  public subscribe(options: SubscriptionOptions, callbackFun: any) {
     return this._client.subscribe(options).subscribe(value => {
       if (value.data) {
-        options.query
-        const data = this._client.readQuery({
-          query: gql`
-            ${oldQuery}
-          `,
-        })
-        this._client.writeQuery({
-          query: gql`
-            ${oldQuery}
-          `,
-          data: { ...data, value },
-        })
+        console.log('value', value)
         callbackFun(value)
       }
     })

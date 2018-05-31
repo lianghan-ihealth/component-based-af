@@ -41,6 +41,9 @@ PContainer.bind<IDataProxy>(TYPES.IDataProxy)
 PContainer.bind<string>('Url')
   .toConstantValue('http://localhost:3081/graphql')
   .whenInjectedInto(GraphQLDataProxy)
+PContainer.bind<string>('WsUrl')
+  .toConstantValue('ws://localhost:3081/feedback')
+  .whenInjectedInto(GraphQLDataProxy)
 //PContainer.bind<AbstractRepository<any>>(TYPES.AbstractRepository).to(MemoryRepository);
 
 //PContainer.bind<IQueryBuilder>(TYPES.IQueryBuilder).to(GraphQLQueryBuilder)

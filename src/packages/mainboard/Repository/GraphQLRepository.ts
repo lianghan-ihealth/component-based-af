@@ -23,7 +23,7 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
   //private _graphql: string
   private _entity_ctor: IEntityConstructor<T>
   private _regxQuery = new RegExp(
-    '\\s*(query|mutation)\\s+([a-zA-Z][\\w\\d]*)\\s*{\\s*([a-zA-Z][\\w\\d]*)'
+    '\\s*(query|mutation|subscription)\\s+([a-zA-Z][\\w\\d]*)\\s*{\\s*([a-zA-Z][\\w\\d]*)'
   )
   //private _regxFrom = new RegExp('(\\s*(query|mutation)\\s+)([a-zA-Z][\\w\\d]*)\\s*{\\s*([a-zA-Z][\\w\\d]*)')
   constructor(
@@ -299,7 +299,7 @@ export class GraphQLRespository<T extends AbstractcBaseEntity>
           ${gqlQuery}
         `,
       },
-      gqlQuery.replace(new RegExp('^subscription'), 'query'),
+      //gqlQuery.replace(new RegExp('^subscription'), 'query'),
       data => {
         let message = new Message()
         message.Data = data
