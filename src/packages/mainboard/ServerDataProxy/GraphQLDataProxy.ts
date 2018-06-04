@@ -1,4 +1,7 @@
-import { InMemoryCache } from 'apollo-cache-inmemory'
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher,
+} from 'apollo-cache-inmemory'
 import { ApolloClient, ObservableQuery } from 'apollo-client'
 import { HttpLink, createHttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
@@ -61,10 +64,27 @@ export class GraphQLDataProxy implements IDataProxy {
       wsLink,
       afterwareLink
     )
+    const fragmentMatcher = new IntrospectionFragmentMatcher({
+      introspectionQueryResultData: {
+        __schema: {
+          types: [
+            {
+              kind: 'INTERFACE',
+              name: 'ChatMessage',
+              possibleTypes: [
+                { name: 'AudioMessage' },
+                { name: 'TextMessage' },
+                { name: 'ImageMessage' },
+              ],
+            },
+          ],
+        },
+      },
+    })
     //const link = new HttpLink({ uri: url })
     this._client = new ApolloClient({
       link: middlewareLink.concat(link),
-      cache: new InMemoryCache(),
+      cache: new InMemoryCache({ fragmentMatcher: fragmentMatcher }),
       defaultOptions: {
         watchQuery: {
           fetchPolicy: 'cache-and-network',
@@ -116,8 +136,8 @@ export class GraphQLDataProxy implements IDataProxy {
   public subscribe(options: SubscriptionOptions, callbackFun: any) {
     return this._client.subscribe(options).subscribe(value => {
       if (value.data) {
-        console.log('value', value)
-        callbackFun(value)
+        //console.log('value', value)
+        callbackFun(value.data)
       }
     })
   }

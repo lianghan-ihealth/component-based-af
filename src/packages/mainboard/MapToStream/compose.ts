@@ -15,15 +15,17 @@ export function compose(...items: any[]) {
     const pipes = values.filter(item => typeof item === 'function')
     //console.log('funs', pipes)
     const toMerge = observables.length === 0 ? [of({})] : observables
-    const result$ = merge(...toMerge).pipe(
-      scan((props, emitted) =>
-        //console.log(props),
-        ({
-          ...props,
-          ...emitted,
-        })
+    const result$ = merge(...toMerge)
+      .pipe(
+        scan((props, emitted) =>
+          //console.log(props),
+          ({
+            ...props,
+            ...emitted,
+          })
+        )
       )
-    )
+      .pipe(...pipes)
     return result$
   }
 }
