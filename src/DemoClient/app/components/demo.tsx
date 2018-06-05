@@ -13,7 +13,7 @@ import { recompose } from '../../../packages/react-mainboard'
 type setCounterFuncType = (counter: number) => void
 interface DemoComponentProps {
   counter: number
-  AllMessage: {}
+  //AllMessage: {}
   Messages: {}
   getUserByIds: {}
   chatMessageAdded: {}
@@ -26,6 +26,31 @@ class DemoComponent extends React.Component<DemoComponentProps, any> {
     const service = new DemoServices()
     service.getPatient()
     service.getAddMessage()
+    this.state = { messages: '' }
+  }
+  componentDidMount() {
+    // this.setState((prevState, props) => ({
+    //   messages:
+    //     prevState.messages +
+    //     get(props.Messages, 'patient.boundDetails.chatRoom.messages["0"].text'),
+    // }))
+  }
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (this.state.messages) {
+      this.setState({
+        messages:
+          this.state.messages +
+          get(nextProps.chatMessageAdded, 'chatMessageAdded.text', ''),
+      })
+    } else {
+      this.setState({
+        messages: get(
+          nextProps.Messages,
+          'patient.boundDetails.chatRoom.messages["0"].text',
+          ''
+        ),
+      })
+    }
   }
   render() {
     // console.log(this.props)
@@ -64,33 +89,33 @@ class DemoComponent extends React.Component<DemoComponentProps, any> {
           </span>
         </p>
         <p>
-          AllMessages: <span id="AllMessages">{this.props.AllMessage}</span>
+          AllMessages: <span id="AllMessages">{this.state.messages}</span>
         </p>
       </div>
     )
   }
 }
 const HocComponent = recompose(
-  withDefaults({ AllMessage: ' ' }),
+  //withDefaults({ AllMessage: ' ' }),
   withMessageBus('Patient', 'getUserByIds'),
   withMessageBus('Patient', 'Messages'),
   withMessageBus('Patient', 'chatMessageAdded'),
   withDefaults({ counter: 34 }),
-  withState('counter', 'setCounter', 56),
-  map(props => {
-    return {
-      ...props,
-      AllMessage:
-        get(
-          props,
-          'Messages.patient.boundDetails.chatRoom.messages["0"].text'
-        ) + get(props, 'chatMessageAdded.chatMessageAdded.text', ''),
-    }
-  }),
-  shouldUpdate((prevProps, nextProps) => {
-    console.log('nextProps', nextProps)
-    console.log('prevProps', prevProps)
-    return true
-  })
+  withState('counter', 'setCounter', 56)
+  // map(props => {
+  //   return {
+  //     ...props,
+  //     AllMessage:
+  //       get(
+  //         props,
+  //         'Messages.patient.boundDetails.chatRoom.messages["0"].text'
+  //       ) + get(props, 'chatMessageAdded.chatMessageAdded.text', ''),
+  //   }
+  // })
+  // shouldUpdate((prevProps, nextProps) => {
+  //   //console.log('nextProps', nextProps)
+  //   //console.log('prevProps', prevProps)
+  //   return true
+  // })
 )(DemoComponent)
 export default HocComponent
